@@ -31,7 +31,9 @@
       this.$ajax.get("/check-car/app/check/userOrders", {
       }).then((res)=> {
         if (res.data.code == 200) {
+					console.log(res.data.data[0])
           this.order_list = res.data.data[0].orderEntity;
+					let alipayNotifyEntity = res.data.data[0].alipayNotifyEntity;
           this.agentAddress = res.data.data[0].agentEntity.agentAddress;
           switch (this.order_list.orderState) {
             case 1:this.order_list.orderState = "下单成功";
@@ -49,7 +51,10 @@
             case 7:this.order_list.orderState = "评论完成";
               break;
             default :this.order_list.orderState = ''
-          }
+          };
+					if(alipayNotifyEntity&&alipayNotifyEntity.tradeStatus == 'TRADE_SUCCESS'){
+						this.order_list.orderState = "支付成功";
+					}
 
         }
       });

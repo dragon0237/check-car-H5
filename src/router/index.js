@@ -21,7 +21,7 @@ Vue.use(VueResource);
 
 // 数据请求
 import Axios from 'axios'
-Axios.defaults.baseURL = 'http://localhost:8080';
+Axios.defaults.baseURL = 'http://129.204.110.142:8080';
 // Axios.defaults.baseURL = '/api';
 Vue.prototype.$ajax = Axios;
 
@@ -33,7 +33,7 @@ if (userInfo) {
     let token = userInfo.token;
     if (token) {  // 判断是否存在token，如果存在的话，则每个http header都加上token
       config.headers.token = token;
-    }
+    }  
     return config
   }, error => {
     /*return Promise.reject(error)*/

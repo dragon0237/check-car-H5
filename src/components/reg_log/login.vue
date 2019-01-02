@@ -69,6 +69,9 @@
                   params.token = res.data.token;
                   params.date = new Date();
                 localStorage.setItem('USER',JSON.stringify(params));
+								console.log("------")
+								console.log(JSON.parse(localStorage.getItem('USER')));
+								
                 //保存session
                   //跳转到首页
                 this.$router.push({name: 'index'})

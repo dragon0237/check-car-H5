@@ -96,13 +96,15 @@
           this.$ajax.post('/check-car/app/check/uploadCarPic',param)
             .then((res)=>{
               console.log(res);
-							let userInfo = JSON.parse(localStorage.getItem('USER'));
-							let token = userInfo.token;
-							console.log(userInfo)
-							console.log(token)
-							console.log('http://localhost:8080/check-car/app/showCarPic?token='+token)
-							this.headpic= ''
-							this.headpic = 'http://localhost:8080/check-car/app/showCarPic?token='+token
+							if(res.data.code == 200){
+								this.headpic = 'http://129.204.110.142:8080/check-car/app//sms/showCarPic/'+res.data.data
+							}
+// 							let userInfo = JSON.parse(localStorage.getItem('USER'));
+// 							let token = userInfo.token;
+// 							console.log(userInfo)
+// 							console.log(token)
+// 							console.log('http://localhost:8080/check-car/app/showCarPic/'+token)
+// 							this.headpic = 'http://localhost:8080/check-car/app/showCarPic/'+token
 //               if (res.data.code == 200){
 //                 this.$ajax.get('/check-car/app/showCarPic')
 //                   .then((res)=>{

@@ -33,16 +33,18 @@
 					console.log( this.order_list)
 					console.log("orderId:"+ this.order_list.orderId)
 					
-					window.open("http://localhost:8080"+"/check-car/app/alipay/goAlipay/"+this.order_list.orderId)
+					window.open("http://129.204.110.142:8080"+"/check-car/app/alipay/goAlipay/"+this.order_list.orderId)
 					
-					window.location.href="http://localhost:8080"+"/check-car/app/alipay/goAlipay/"+this.order_list.orderId
+					this.$router.push({name:'order_list'})
 					
-          this.$ajax.get("/check-car/app/alipay/goAlipay/"+this.order_list.orderId, {
-          }).then((res)=> {
-            if (res.data.code == 200) {
-
-            }
-          });
+// 					window.location.href="http://localhost:8080"+"/check-car/app/alipay/goAlipay/"+this.order_list.orderId
+// 					
+//           this.$ajax.get("/check-car/app/alipay/goAlipay/"+this.order_list.orderId, {
+//           }).then((res)=> {
+//             if (res.data.code == 200) {
+// 
+//             }
+//           });
         }
       },
       created(){
