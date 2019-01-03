@@ -35,27 +35,27 @@
           this.order_list = res.data.data[0].orderEntity;
 					let alipayNotifyEntity = res.data.data[0].alipayNotifyEntity;
           this.agentAddress = res.data.data[0].agentEntity.agentAddress;
-          switch (this.order_list.orderState) {
-            case 1:this.order_list.orderState = "下单成功";
-              break;
-            case 2:this.order_list.orderState = "配单成功";
-              break;
-            case 3:this.order_list.orderState = "订单拒绝";
-              break;
-            case 4:this.order_list.orderState = "开始检车";
-              break;
-            case 5:this.order_list.orderState = "订单完成";
-              break;
-            case 6:this.order_list.orderState = "订单处理失败";
-              break;
-            case 7:this.order_list.orderState = "评论完成";
-              break;
-            default :this.order_list.orderState = ''
-          };
 					if(alipayNotifyEntity&&alipayNotifyEntity.tradeStatus == 'TRADE_SUCCESS'){
 						this.order_list.orderState = "支付成功";
+					}else{
+						switch (this.order_list.orderState) {
+							case 1:this.order_list.orderState = "下单成功";
+								break;
+							case 2:this.order_list.orderState = "配单成功";
+								break;
+							case 3:this.order_list.orderState = "订单拒绝";
+								break;
+							case 4:this.order_list.orderState = "开始检车";
+								break;
+							case 5:this.order_list.orderState = "订单完成";
+								break;
+							case 6:this.order_list.orderState = "订单处理失败";
+								break;
+							case 7:this.order_list.orderState = "评论完成";
+								break;
+							default :this.order_list.orderState = ''
+						};
 					}
-
         }
       });
     }

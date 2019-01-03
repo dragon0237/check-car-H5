@@ -10,7 +10,7 @@
           </div>
       </mu-paper>
       <mu-form class="mu-demo-form" ref="form" :model="validateForm" label-position="left" label-width="80">
-        <mu-form-item label="昵称" prop="username" :rules="usernameRules">
+        <mu-form-item label="姓名" prop="username" :rules="usernameRules">
           <mu-text-field max-length="10" v-model="validateForm.username" prop="username"></mu-text-field>
         </mu-form-item>
         <mu-form-item label="手机号" prop="mobile" :rules="mobileRules">
@@ -20,7 +20,7 @@
           <mu-text-field max-length="16"  type="password" v-model="validateForm.password" prop="password"></mu-text-field>
         </mu-form-item>
         <mu-form-item>
-          <mu-button color="primary" @click="submit">注册</mu-button>
+          <mu-button color="primary" @touchstart="submit">注册</mu-button>
         </mu-form-item>
       </mu-form>
     </mu-container>
@@ -37,19 +37,14 @@
 
 </template>
 
-
-
-
-
-
 <script>
   export default {
     name: "register",
     data() {
       return {
         usernameRules: [
-          {validate: (val) => !!val, message: '必须填写昵称'},
-          {validate: (val) => val.length >= 1, message: '用户名长度大于1小于10'}
+          {validate: (val) => !!val, message: '必须填写姓名'},
+          {validate: (val) => val.length >= 1, message: '用户名长度大于2小于5'}
         ],
         mobileRules: [
           {validate: (val) => !!val, message: '必须填写手机号'},
@@ -98,6 +93,11 @@
                 this.openSimple = true;
                 this.msg = '注册成功';
                 this.sign = true
+								let params = {};
+									params.expire = res.data.expire;
+									params.token = res.data.token;
+									params.date = new Date();
+								localStorage.setItem('USER',JSON.stringify(params));
 
               }else{
                 this.openSimple = true;
@@ -113,7 +113,7 @@
       closeSimpleDialog () {
         this.openSimple = false;
         if (this.sign) {
-          this.$router.push({name:'login'})
+          this.$router.push({name:'index'})
         }
       }
     },

@@ -25,10 +25,8 @@
         <div class="box" >
           <p class="name">{{item.agentAddress}}</p>
           <p>代理商所在地:{{item.agentCity}}<span class="tel">代理商电话:{{item.agentCall}}</span></p>
-          <span class="col-md-3">小车费用：￥{{item.smallPrice}}</span>
-          <span class="col-md-3">中车费用：￥{{item.middlePrice}}</span>
-          <span class="col-md-3">大车费用：￥{{item.bigPrice}}</span>
-          <span class="col-md-3">服务费用：￥{{item.tinyPrice}}</span>
+          <span class="col-md-3">5座车服务费用：￥{{item.smallPrice}}</span>
+          <span class="col-md-3">7座车服务费用：￥{{item.bigPrice}}</span>
           <span class="col-md-3">运营车费用：￥{{item.operatePrice}}</span>
         </div>
         <div class="appoint" :id="item.agentId" @click="agent">

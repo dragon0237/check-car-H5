@@ -1,44 +1,48 @@
  <template>
   <mu-container>
     <div class="font_pic">
-      <input class="fileInput" type="file" id="avater" name="file" accept="image/png,image/gif,image/jpeg" @change="update" />
-      <img :src="headpic" id="ex_img">
+			<img v-if="refresh_img" :src="headpic" id="ex_img" :class="isUploadImg ? 'upload_pic2' : 'upload_pic' ">
+			<span v-if="! isReadonly">上传行驶证的正面照片</span>
+      <input class="fileInput" type="file" id="avater" name="file" accept="image/png,image/gif,image/jpeg" :disabled="isReadonly" @change="update" />
+      
     </div>
     <mu-form :model="form" class="mu-demo-form" label-position="left" label-width="100">
-      <mu-flex class="select-control-row">
-        <mu-checkbox v-model="checkbox" :label="'运营车：状态选择'"></mu-checkbox>
-      </mu-flex>
+      
       <mu-form-item prop="select" label="车辆类型">
-        <mu-select v-model="form.carType">
-          <mu-option v-for="(index,item) in options" :key="index" :label="index" :value="item"></mu-option>
+        <mu-select v-model="form.carType" :readonly="isReadonly">
+          <mu-option v-for="(index,item) in options" :key="index" :label="index" :value="item" :readonly="isReadonly"></mu-option>
         </mu-select>
       </mu-form-item>
-      <mu-form-item prop="input" label="车辆号牌">
-        <mu-text-field v-model="form.carId"></mu-text-field>
+      <mu-form-item prop="carId" label="车辆号牌" :rules="carIdRules">
+        <mu-text-field v-model="form.carId" prop="carId" :readonly="isReadonly"></mu-text-field>
       </mu-form-item>
-      <mu-form-item prop="input" label="发动机号">
-        <mu-text-field v-model="form.engineId"></mu-text-field>
+      <mu-form-item prop="vinId" label="车辆识别代号" :rules="vinIdRules">
+        <mu-text-field v-model="form.vinId" prop="vinId" :readonly="isReadonly"></mu-text-field>
       </mu-form-item>
-      <mu-form-item prop="date" label="注册日期">
-        <mu-date-input v-model="form.registerTime" container="dialog"  full-width></mu-date-input>
-
+      <mu-form-item prop="date" label="车辆注册日期">
+        <mu-date-input v-model="form.registerTime" container="dialog" :disabled="isReadonly"  full-width></mu-date-input>
       </mu-form-item>
-      <mu-form-item prop="input" label="联系手机">
-        <mu-text-field v-model="form.call"></mu-text-field>
-      </mu-form-item>
-      <!--<mu-form-item prop="input" label="验证码">
-        <mu-text-field v-model="form.smscode"></mu-text-field>
-      </mu-form-item>-->
-      <mu-button class="nextBtn" @click="to_next" color="primary">下一步</mu-button>
+			<mu-flex align-items="center" style="padding-bottom: 8px;">
+				<span style="margin-right: 16px;">是否为运营车:</span>
+				<mu-radio v-model="operateCar" style="margin-right: 16px;" value="1" label="是" ></mu-radio>
+				<mu-radio v-model="operateCar" style="margin-right: 16px;" value="0" label="否" ></mu-radio>
+			</mu-flex>
+			
+			<mu-button class="editBtn" round color="success" v-if="isReadonly" @click="editInfo">修改</mu-button>
+			<mu-button class="nextBtn" @touchstart="to_next" color="primary">下一步</mu-button>
+			
     </mu-form>
     <div class="suporse">
       技术支持：北京道火自然科技
     </div>
     <mu-dialog title="提示信息" width="360" :open.sync="openSimple">
       {{msg}}
-      <mu-button slot="actions" flat color="primary" @click="closeSimpleDialog">Close</mu-button>
+      <mu-button slot="actions" flat color="primary" @click="closeSimpleDialog">关闭</mu-button>
     </mu-dialog>
+		
   </mu-container>
+	
+	
 </template>
 
 <script>
@@ -46,11 +50,20 @@
         name: "app_form",
       data () {
         return {
+					refresh_img: true,
+					isUploadImg: false,
+					isReadonly: false,
+					carIdRules: [
+						{validate: (val) => !!val, message: '必须填写车牌号'},
+						{validate: (val) => this.isLicensePlate(val), message: '车牌号有误'}
+					],
+					vinIdRules: [
+						{validate: (val) => !!val, message: '必须填写车辆识别代号'},
+						{validate: (val) => val.length == 17 , message: '请正确输入17位的车辆识别代号'}
+					],
           options: {
-            1:'微型车',
-            2:'小型车',
-            3:'中型车',
-            4:'大型车'
+            5:'五座汽车',
+            7:'七座汽车'
           },
           msg:"",
           openSimple: false,
@@ -59,23 +72,68 @@
             carType: '',
             smscode:'',
             carId: '',
-            engineId: '',
-            registerTime: '',
-            call: ''
+            vinId: '',
+            registerTime: ''
+						
           },
-          checkbox: true,
-          headpic: '../../../static/aui/image/demo4.png'
+					operateCar: '',
+          headpic: '../../../static/images/uploadCar.png'
         }
       },
+			computed: {
+				img_class: function(){
+					if(this.isReadonly){
+						return upload_pic2;
+					}else{
+						return upload_pic;
+					}
+				}
+			},
+			created(){
+				console.log("activated")
+				this.init()
+			},
       methods: {
+				init(){
+					console.log("init")
+					this.$ajax.get("/check-car/app/check/user/getCarInfo")
+					.then((res)=> {
+						console.log(res)
+						if (res.data.code ==200){
+							// == 1 ? true:false
+							// this.form.operateCar = res.data.carInfo.operateCar 
+							
+							this.form.carType = res.data.carInfo.carType == 5 ? '五座汽车':'七座汽车'
+							this.form.carId = res.data.carInfo.carId
+							this.form.vinId = res.data.carInfo.vinId
+							this.form.registerTime = res.data.carInfo.registerTime
+							this.headpic = 'http://129.204.110.142:8080/check-car/app//sms/showCarPic/'+res.data.carInfo.userId
+							this.operateCar = res.data.carInfo.operateCar
+							this.isReadonly=true
+							this.isUploadImg=true
+							console.log("operateCar:"+this.operateCar)
+						}
+					}); 
+					
+				},
+				editInfo(){
+					this.isReadonly = !this.isReadonly
+				},
+				// 驾驶证校验
+				isLicensePlate(str) {
+					return /^(([京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领][A-Z](([0-9]{5}[DF])|([DF]([A-HJ-NP-Z0-9])[0-9]{4})))|([京津沪渝冀豫云辽黑湘皖鲁新苏浙赣鄂桂甘晋蒙陕吉闽贵粤青藏川宁琼使领][A-Z][A-HJ-NP-Z0-9]{4}[A-HJ-NP-Z0-9挂学警港澳使领]))$/.test(str)
+				},
         to_next(){
+					if(this.isReadonly){
+						this.$router.push({name:'agent'})
+					}
           this.$ajax.post("/check-car/app/check/user/addUserCar", {
             "carType": this.form.carType,
             "carId": this.form.carId,
-            "engineId": this.form.engineId,
+            "vinId": this.form.vinId,
             "registerTime": this.form.registerTime,
-            "operateCar": (this.checkbox == true? 1: 0),
-            "call": this.form.call
+						// ( == true? 1: 0)
+            "operateCar": this.form.operateCar
           }).then((res)=> {
             if (res.data.code ==200){
               this.$router.push({name:'agent'})
@@ -97,7 +155,10 @@
             .then((res)=>{
               console.log(res);
 							if(res.data.code == 200){
-								this.headpic = 'http://129.204.110.142:8080/check-car/app//sms/showCarPic/'+res.data.data
+								this.isUploadImg=true
+								this.refresh_img=false
+								this.headpic = 'http://129.204.110.142:8080/check-car/app/sms/showCarPic/'+res.data.data
+								this.refresh_img=true
 							}
 // 							let userInfo = JSON.parse(localStorage.getItem('USER'));
 // 							let token = userInfo.token;
@@ -117,6 +178,9 @@
 //               }
             })
         },
+
+				
+				
       }
     }
 </script>
@@ -125,15 +189,39 @@
 .font_pic{
   margin-bottom: 2rem;
   height: 10rem;
-  background-color: #ffa2c4;
+  /* background-color: #ffa2c4; */
 }
-.font_pic img{
+.upload_pic{
+	width: 20%;
+	height: 20%;
+	margin-left: 41%;
+	margin-top: 20%;
+	/* text-align: center; */
+	
+}
+.upload_pic2{
+	width: 100%;
+	height: 100%;
+}
+.font_pic span{
+	margin-left: 36%;
+	margin-top: 21%;
+	font-size: 14px; 
+	font-weight: 500;
+}
+/* .font_pic img{
   width: 100%;
   height: 100%;
-}
+} */
 .nextBtn{
   margin-left: 15px;
   width: 90%;
+}
+
+.editBtn{
+	margin-bottom: 10px;
+  margin-left: 30%;
+  width: 40%;
 }
 .suporse{
   margin: 0.5rem auto;
@@ -141,11 +229,14 @@
 }
 /*定义上传*/
 .fileInput{
+
   width: 98%;
   height: 160px;
   position: absolute;
   right: 0;
   top: 72px;
-  opacity: 0;
+  opacity: 0
 }
+
+	
 </style>

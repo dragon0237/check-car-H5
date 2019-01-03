@@ -31,6 +31,7 @@
         localStorage.clear();
         this.$router.push({name: 'login'})
       }
+			
     }
   }
     }

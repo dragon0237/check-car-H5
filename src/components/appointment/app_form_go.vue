@@ -14,11 +14,11 @@
           <mu-option v-for="(index,item) in driverType" :key="index" :label="index" :value="item"></mu-option>
         </mu-select>
       </mu-form-item>
-      <mu-button class="nextBtn" @click="comfired" color="primary">确认</mu-button>
+      <mu-button class="nextBtn" @touchstart="comfired" color="primary">确认</mu-button>
     </mu-form>
     <mu-dialog title="提示信息" width="360" :open.sync="openSimple">
       {{msg}}
-      <mu-button slot="actions" flat color="primary" @click="closeSimpleDialog">Close</mu-button>
+      <mu-button slot="actions" flat color="primary" @touchstart="closeSimpleDialog">关闭</mu-button>
     </mu-dialog>
   </mu-container>
 </template>
