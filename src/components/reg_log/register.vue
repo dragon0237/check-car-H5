@@ -20,7 +20,7 @@
           <mu-text-field max-length="16"  type="password" v-model="validateForm.password" prop="password"></mu-text-field>
         </mu-form-item>
         <mu-form-item>
-          <mu-button color="primary" @touchstart="submit">注册</mu-button>
+          <mu-button color="primary" @click="submit">注册</mu-button>
         </mu-form-item>
       </mu-form>
     </mu-container>
@@ -31,7 +31,7 @@
     </div>
     <mu-dialog title="提示信息" width="360" :open.sync="openSimple">
       {{msg}}
-      <mu-button slot="actions" flat color="primary" @click="closeSimpleDialog">Close</mu-button>
+      <mu-button slot="actions" flat color="primary" @click="closeSimpleDialog">关闭</mu-button>
     </mu-dialog>
   </div>
 

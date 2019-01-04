@@ -29,7 +29,7 @@
 			</mu-flex>
 			
 			<mu-button class="editBtn" round color="success" v-if="isReadonly" @click="editInfo">修改</mu-button>
-			<mu-button class="nextBtn" @touchstart="to_next" color="primary">下一步</mu-button>
+			<mu-button class="nextBtn" @click="to_next" color="primary">下一步</mu-button>
 			
     </mu-form>
     <div class="suporse">
@@ -107,7 +107,7 @@
 							this.form.carId = res.data.carInfo.carId
 							this.form.vinId = res.data.carInfo.vinId
 							this.form.registerTime = res.data.carInfo.registerTime
-							this.headpic = 'http://129.204.110.142:8080/check-car/app//sms/showCarPic/'+res.data.carInfo.userId
+							this.headpic = 'http://129.204.110.142:8080/check-car/app/sms/showCarPic/'+res.data.carInfo.userId
 							this.operateCar = res.data.carInfo.operateCar
 							this.isReadonly=true
 							this.isUploadImg=true

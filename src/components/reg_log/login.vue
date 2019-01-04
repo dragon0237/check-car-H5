@@ -15,9 +15,8 @@
          <!-- <span style="float: right">使用滴滴账号登录</span>-->
         </div>
         <mu-form-item>
-          <mu-button color="primary" @touchstart="submit">登录</mu-button>
+          <mu-button color="primary" @click="submit">登录</mu-button>
         </mu-form-item>
-
       </mu-form>
     </mu-container>
     <div class="toReg">
@@ -27,7 +26,7 @@
     </div>
     <mu-dialog title="提示信息" width="360" :open.sync="openSimple">
       {{msg}}
-      <mu-button slot="actions" flat color="primary" @click="closeSimpleDialog">Close</mu-button>
+      <mu-button slot="actions" flat color="primary" @click="closeSimpleDialog">关闭</mu-button>
     </mu-dialog>
   </div>
 
@@ -53,6 +52,7 @@
     },
     methods: {
       submit() {
+				console.log("into login")
         const date1 = new Date();
         // let params = {mobile:18241033575,password:123456,token:'4556'};
         // sessionStorage.setItem('USER',JSON.stringify(params));
