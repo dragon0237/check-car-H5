@@ -142,7 +142,7 @@
                       this.form.plateNum = res.data.carInfo.plateNum;
                       this.form.vinId = res.data.carInfo.vin;
                       this.form.registerDate = res.data.carInfo.registerDate;
-                      this.headpic = 'http://localhost:8080/check-car/app/sms/showCarPic/'+res.data.carInfo.userId+'/'+res.data.carInfo.plateNum;
+                      this.headpic = 'http://129.204.110.142:8080/check-car/app/sms/showCarPic/'+res.data.carInfo.userId+'/'+res.data.carInfo.plateNum;
                       this.operateCar = JSON.stringify(res.data.carInfo.operateCar);
                       // this.isReadonly=true;
                       this.isUploadImg=true;
