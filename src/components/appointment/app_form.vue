@@ -4,33 +4,33 @@
 			<img v-if="refresh_img" :src="headpic" id="ex_img" :class="isUploadImg ? 'upload_pic2' : 'upload_pic' ">
 			<span v-if="! isReadonly">上传行驶证的正面照片</span>
       <input class="fileInput" type="file" id="avater" name="file" accept="image/png,image/gif,image/jpeg" :disabled="isReadonly" @change="update" />
-      
+
     </div>
     <mu-form :model="form" class="mu-demo-form" label-position="left" label-width="100">
-      
+
       <mu-form-item prop="select" label="车辆类型">
         <mu-select v-model="form.carType" :readonly="isReadonly">
           <mu-option v-for="(index,item) in options" :key="index" :label="index" :value="item" :readonly="isReadonly"></mu-option>
         </mu-select>
       </mu-form-item>
-      <mu-form-item prop="carId" label="车辆号牌" :rules="carIdRules">
-        <mu-text-field v-model="form.carId" prop="carId" :readonly="isReadonly"></mu-text-field>
+      <mu-form-item prop="plateNum" label="车辆号牌" :rules="carIdRules">
+        <mu-text-field v-model="form.plateNum" prop="plateNum" :readonly="isReadonly"></mu-text-field>
       </mu-form-item>
       <mu-form-item prop="vinId" label="车辆识别代号" :rules="vinIdRules">
-        <mu-text-field v-model="form.vinId" prop="vinId" :readonly="isReadonly"></mu-text-field>
+        <mu-text-field v-model="form.vinId" prop="vinId" max-length="17" :readonly="isReadonly"></mu-text-field>
       </mu-form-item>
       <mu-form-item prop="date" label="车辆注册日期">
-        <mu-date-input v-model="form.registerTime" container="dialog" :disabled="isReadonly"  full-width></mu-date-input>
+        <mu-date-input v-model="form.registerDate" container="dialog" :disabled="isReadonly"  full-width></mu-date-input>
       </mu-form-item>
 			<mu-flex align-items="center" style="padding-bottom: 8px;">
 				<span style="margin-right: 16px;">是否为运营车:</span>
-				<mu-radio v-model="operateCar" style="margin-right: 16px;" value="1" label="是" ></mu-radio>
+				<mu-radio v-model="operateCar" style="margin-right: 16px;" checked value="1" label="是" ></mu-radio>
 				<mu-radio v-model="operateCar" style="margin-right: 16px;" value="0" label="否" ></mu-radio>
 			</mu-flex>
-			
-			<mu-button class="editBtn" round color="success" v-if="isReadonly" @click="editInfo">修改</mu-button>
+      <mu-circular-progress v-if="this.loading" class="loading demo-circular-progress" :size="36"></mu-circular-progress>
+			<!--<mu-button class="editBtn" round color="success" v-if="isReadonly" @click="editInfo">修改</mu-button>-->
 			<mu-button class="nextBtn" @click="to_next" color="primary">下一步</mu-button>
-			
+
     </mu-form>
     <div class="suporse">
       技术支持：北京道火自然科技
@@ -39,10 +39,10 @@
       {{msg}}
       <mu-button slot="actions" flat color="primary" @click="closeSimpleDialog">关闭</mu-button>
     </mu-dialog>
-		
+
   </mu-container>
-	
-	
+
+
 </template>
 
 <script>
@@ -70,13 +70,13 @@
           labelPosition: 'left',
           form: {
             carType: '',
-            smscode:'',
-            carId: '',
+            plateNum: '',
             vinId: '',
-            registerTime: ''
-						
+            registerDate: ''
+
           },
-					operateCar: '',
+          loading: false,
+					operateCar: '1',
           headpic: '../../../static/images/uploadCar.png'
         }
       },
@@ -89,33 +89,8 @@
 					}
 				}
 			},
-			created(){
-				console.log("activated")
-				this.init()
-			},
       methods: {
-				init(){
-					console.log("init")
-					this.$ajax.get("/check-car/app/check/user/getCarInfo")
-					.then((res)=> {
-						console.log(res)
-						if (res.data.code ==200){
-							// == 1 ? true:false
-							// this.form.operateCar = res.data.carInfo.operateCar 
-							
-							this.form.carType = res.data.carInfo.carType == 5 ? '五座汽车':'七座汽车'
-							this.form.carId = res.data.carInfo.carId
-							this.form.vinId = res.data.carInfo.vinId
-							this.form.registerTime = res.data.carInfo.registerTime
-							this.headpic = 'http://129.204.110.142:8080/check-car/app/sms/showCarPic/'+res.data.carInfo.userId
-							this.operateCar = res.data.carInfo.operateCar
-							this.isReadonly=true
-							this.isUploadImg=true
-							console.log("operateCar:"+this.operateCar)
-						}
-					}); 
-					
-				},
+
 				editInfo(){
 					this.isReadonly = !this.isReadonly
 				},
@@ -128,12 +103,12 @@
 						this.$router.push({name:'agent'})
 					}
           this.$ajax.post("/check-car/app/check/user/addUserCar", {
-            "carType": this.form.carType,
-            "carId": this.form.carId,
+            "carType": this.form.carType == '五座汽车'?5:7,
+            "plateNum": this.form.plateNum,
             "vinId": this.form.vinId,
-            "registerTime": this.form.registerTime,
+            "registerDate": this.form.registerDate,
 						// ( == true? 1: 0)
-            "operateCar": this.form.operateCar
+            "operateCar": this.operateCar
           }).then((res)=> {
             if (res.data.code ==200){
               this.$router.push({name:'agent'})
@@ -147,40 +122,46 @@
           this.openSimple = false;
         },
         update(e){
+          this.loading = true;
           let file = e.target.files[0];
           let param = new window.FormData(); //创建form对象
           param.append('file',file);//通过append向form对象添加数据
-          // console.log(param.get('file')); //FormData私有类对象，访问不到，可以通过get判断值是否传进去
           this.$ajax.post('/check-car/app/check/uploadCarPic',param)
             .then((res)=>{
-              console.log(res);
-							if(res.data.code == 200){
-								this.isUploadImg=true
-								this.refresh_img=false
-								this.headpic = 'http://129.204.110.142:8080/check-car/app/sms/showCarPic/'+res.data.data
-								this.refresh_img=true
-							}
-// 							let userInfo = JSON.parse(localStorage.getItem('USER'));
-// 							let token = userInfo.token;
-// 							console.log(userInfo)
-// 							console.log(token)
-// 							console.log('http://localhost:8080/check-car/app/showCarPic/'+token)
-// 							this.headpic = 'http://localhost:8080/check-car/app/showCarPic/'+token
-//               if (res.data.code == 200){
-//                 this.$ajax.get('/check-car/app/showCarPic')
-//                   .then((res)=>{
-//                     console.log(res);
-// 										this.headpic = 'http://localhost:8080/check-car/app/showCarPic'
-//                     if (res.data.code == 200){
-// 											this.headpic = 'http://localhost:8080/check-car/app/showCarPic'
-//                     }
-//                   })
-//               }
+              if(res.data.code == 200){
+                console.log(res);
+                this.isUploadImg=true;
+								this.refresh_img=false;
+								this.refresh_img=true;
+                this.$ajax.get("/check-car/app/check/user/getCarInfo")
+                  .then((res)=> {
+                    if (res.data.code ==200){
+                      // == 1 ? true:false
+                      // this.form.operateCar = res.data.carInfo.operateCar
+                      this.form.carType = res.data.carInfo.carType==5?'五座汽车':'七座汽车';
+                      this.form.plateNum = res.data.carInfo.plateNum;
+                      this.form.vinId = res.data.carInfo.vin;
+                      this.form.registerDate = res.data.carInfo.registerDate;
+                      this.headpic = 'http://localhost:8080/check-car/app/sms/showCarPic/'+res.data.carInfo.userId+'/'+res.data.carInfo.plateNum;
+                      this.operateCar = JSON.stringify(res.data.carInfo.operateCar);
+                      // this.isReadonly=true;
+                      this.isUploadImg=true;
+                    }else if (res.data.code == 500) {
+                      this.openSimple = true;
+                      this.msg = res.data.msg
+                    }
+                    this.loading = false;
+                  });
+							}else if (res.data.code == 500) {
+                this.loading = false;
+                this.openSimple = true;
+                this.msg = res.data.msg;
+              }
             })
         },
 
-				
-				
+
+
       }
     }
 </script>
@@ -197,7 +178,7 @@
 	margin-left: 41%;
 	margin-top: 20%;
 	/* text-align: center; */
-	
+
 }
 .upload_pic2{
 	width: 100%;
@@ -206,7 +187,7 @@
 .font_pic span{
 	margin-left: 36%;
 	margin-top: 21%;
-	font-size: 14px; 
+	font-size: 14px;
 	font-weight: 500;
 }
 /* .font_pic img{
@@ -237,6 +218,11 @@
   top: 72px;
   opacity: 0
 }
+.loading{
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  z-index: 9999;
+}
 
-	
 </style>

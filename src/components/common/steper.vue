@@ -35,7 +35,7 @@
     created(){
       if (this.$route.path === '/app_msg_s') {
         this.activeStep = 1
-      }else if (this.$route.path === '/app_msg_t') {
+      }else if (this.$route.path === '/check_car') {
         this.activeStep = 2
       }else {
         this.activeStep = 0

@@ -1,9 +1,9 @@
-<!--第三步--上传图片-->
+<<!--第三步--上传图片-->
 <template>
     <div class="app_msg_t">
       <steper></steper>
       <div class="o_pic">
-        <img src="../../../static/aui/image/demo6.png" alt="">
+        <img src="/static/images/sign.png" alt="">
       </div>
       <div class="upload_pic">
 

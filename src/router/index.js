@@ -1,12 +1,13 @@
 import Vue from 'vue'
 import Router from 'vue-router'
-import VueResource from 'vue-resource'
 import index from '../components/index'
 import register from '../components/reg_log/register'
 import login from '../components/reg_log/login'
 import server_process from '../components/server_process'
 import order from '../components/order/order'
 import order_list from '../components/order/order_list'
+import check_car from '../components/order/check_car'
+import evaluate from '../components/order/evaluate'
 import agent from '../components/appointment/agent'
 import charge from '../components/appointment/charge'
 import app_msg from '../components/appointment/app_msg'
@@ -14,15 +15,20 @@ import app_msg_s from '../components/appointment/app_msg_s'
 import app_msg_t from '../components/appointment/app_msg_t'
 import steper from '../components/common/steper'
 
+import MuseUI from 'muse-ui'
+import 'muse-ui/dist/muse-ui.css'
 
+
+Vue.use(MuseUI);
 
 Vue.use(Router);
-Vue.use(VueResource);
+
 
 // 数据请求
 import Axios from 'axios'
+// 129.204.110.142
 Axios.defaults.baseURL = 'http://129.204.110.142:8080';
-// Axios.defaults.baseURL = '/api';  
+// Axios.defaults.baseURL = '/api';
 Vue.prototype.$ajax = Axios;
 
 
@@ -31,11 +37,11 @@ let userInfo = JSON.parse(localStorage.getItem('USER'));
 if (userInfo) {
   Axios.interceptors.request.use(config => {
     let token = userInfo.token;
-    if (token) {  // 判断是否存在token，如果存在的话，则每个http header都加上token
-      config.headers.token = token;
-    }  
-    return config
-  }, error => {
+  if (token) {  // 判断是否存在token，如果存在的话，则每个http header都加上token
+    config.headers.token = token;
+  }
+  return config
+}, error => {
     /*return Promise.reject(error)*/
   })
 }
@@ -93,6 +99,16 @@ export default new Router({
       path: '/order_list',
       name: 'order_list',
       component: order_list
+    },
+    {
+      path: '/check_car',
+      name: 'check_car',
+      component: check_car
+    },
+    {
+      path: '/evaluate',
+      name: 'evaluate',
+      component: evaluate
     },
     {
       path: '/server_process',
