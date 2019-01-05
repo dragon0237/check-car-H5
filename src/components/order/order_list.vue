@@ -12,7 +12,7 @@
       <p><span class="lab">订单状态:</span><span>{{order_list.orderState}}</span></p>
 			<p><span class="lab" v-if="isRefuse">订单状态:</span><span>{{order_list.rejectReason}}</span></p>
       <div v-if="this.order_state == 1" @click="to_payfor" class="to_check">
-				去付款<img src="../../../dist/static/images/toPay.png" class="icon_img"/></div>
+				去付款<img src="../../../static/images/toPay.png" class="icon_img"/></div>
 			<div v-if="this.order_state == 2" class="to_wait">等待配单</div>
 			<div v-if="this.order_state == 10" class="to_wait">等待代理商确认</div>
       <div v-if="this.order_state == 3" @click="to_checkcar" class="to_check">配单成功,去检车</div>
