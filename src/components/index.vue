@@ -17,19 +17,21 @@
           <span>车检服务</span>
         </div>
         <div class="main_cell_body">
-          <router-link class="appointment" :to="{name:'app_msg'}">
+          <!-- <router-link class="appointment" :to="{name:'agent'}"> -->
+					<div class="appointment" >
             <div class="head_pic">
-              <img src="../../static/images/car.png" alt="">
+              <img src="/static/images/car.png" alt="">
             </div>
-            <div class="pic_msg">
+            <div class="pic_msg" @click="to_page">
               <p>在线预约 </p>
               <p>一键预约年检，快速办理</p>
             </div>
-          </router-link>
+					</div>
+          <!-- </router-link> -->
           <!--:to="{name:'index'}"-->
           <div class="appointment" @click="replace">
             <div class="head_pic">
-              <img src="../../static/images/people.png" alt="">
+              <img src="/static/images/people.png" alt="">
             </div>
             <div class="pic_msg">
               <p>代驾预约 </p>
@@ -47,19 +49,19 @@
             年检需要准备些什么？
           </div>
           <div class="need">
-            <p><img src="../../static/images/circle.png" alt=""><span>机动车行驶证件(正、副本)</span></p>
-            <p><img src="../../static/images/circle.png" alt=""><span>车主身份证或居住证原件(或代理人身份证原件)</span></p>
-            <p><img src="../../static/images/circle.png" alt=""><span>有效期内的交强险副本原件(含车船税、挂车提供车船税)</span></p>
-            <p><img src="../../static/images/circle.png" alt=""><span>单位车辆需要提供单位出具的委托书(需单位公章)</span></p>
-            <p><img src="../../static/images/circle.png" alt=""><span>三角警示牌</span></p>
+            <p><img src="/static/images/circle.png" alt=""><span>机动车行驶证件(正、副本)</span></p>
+            <p><img src="/static/images/circle.png" alt=""><span>车主身份证或居住证原件(或代理人身份证原件)</span></p>
+            <p><img src="/static/images/circle.png" alt=""><span>有效期内的交强险副本原件(含车船税、挂车提供车船税)</span></p>
+            <p><img src="/static/images/circle.png" alt=""><span>单位车辆需要提供单位出具的委托书(需单位公章)</span></p>
+            <p><img src="/static/images/circle.png" alt=""><span>三角警示牌</span></p>
           </div>
           <div class="prepare">
             那些车需要年检？
           </div>
           <div class="need">
-            <p><img src="../../static/images/circle.png" alt=""><span>注册登记日期超过6年的私家车(6年后1年一检)</span></p>
-            <p><img src="../../static/images/circle.png" alt=""><span>面包车、7座及7座以上车辆(前6年每2年一检，6年后1年一检)</span></p>
-            <p><img src="../../static/images/circle.png" alt=""><span>营运车辆(前5年每1年一检，第6年起每半年一检)</span></p>
+            <p><img src="/static/images/circle.png" alt=""><span>注册登记日期超过6年的私家车(6年后1年一检)</span></p>
+            <p><img src="/static/images/circle.png" alt=""><span>面包车、7座及7座以上车辆(前6年每2年一检，6年后1年一检)</span></p>
+            <p><img src="/static/images/circle.png" alt=""><span>营运车辆(前5年每1年一检，第6年起每半年一检)</span></p>
           </div>
         </div>
       </div>
@@ -95,15 +97,15 @@
               </div>
               <div class="lrbody mas_ul">
                 <ul>
-                  <li><img src="../../static/images/xd.png" alt="">在线下单</li>
+                  <li><img src="/static/images/xd.png" alt="">在线下单</li>
                   <li class="left_dashed"></li>
-                  <li><img src="../../static/images/clgl.png" alt="">自驾/代驾</li>
+                  <li><img src="/static/images/clgl.png" alt="">自驾/代驾</li>
                   <li class="left_dashed"></li>
-                  <li><img src="../../static/images/nianjian.png" alt="">到站年检</li>
+                  <li><img src="/static/images/nianjian.png" alt="">到站年检</li>
                   <li class="left_dashed"></li>
-                  <li><img src="../../static/images/jiaojie.png" alt="">交接还车</li>
+                  <li><img src="/static/images/jiaojie.png" alt="">交接还车</li>
                   <li class="left_dashed"></li>
-                  <li><img src="../../static/images/jiesu.png" alt="">年检结束</li>
+                  <li><img src="/static/images/jiesu.png" alt="">年检结束</li>
                 </ul>
               </div>
             </div>
@@ -117,8 +119,18 @@
     </div>
     <mu-dialog title="提示信息" width="360" :open.sync="openSimple">
       {{msg}}
-      <mu-button slot="actions" flat color="primary" @click="closeSimpleDialog">Close</mu-button>
+      <mu-button slot="actions" flat color="primary" @click="closeSimpleDialog">关闭</mu-button>
     </mu-dialog>
+		
+		<mu-dialog title="提示信息" width="360" :open.sync="openSimple2">
+			请先上传您的行驶证信息!
+			<mu-button slot="actions" flat color="primary" @click="closeSimpleDialog2">前往</mu-button>
+		</mu-dialog>
+		
+		<mu-dialog title="提示信息" width="360" :open.sync="openSimple3">
+			您有未完成的订单!
+			<mu-button slot="actions" flat color="primary" @click="closeSimpleDialog3">前往查看</mu-button>
+		</mu-dialog>
     <foot-nav></foot-nav>
   </div>
 </template>
@@ -135,16 +147,44 @@
         banner: 'banner',
         bannerImg: '',
         openSimple: false,
+				openSimple2: false,
+				openSimple3: false,
         msg: '敬请期待'
       }
     },
     methods: {
+			to_page(){
+					this.$ajax.get("/check-car/app/check/user/getCarInfo", {
+					}).then((res)=> {
+						if (res.data.code ==200){
+							this.$ajax.get("/check-car/app/check/userOrders?type=0", {}).then((res) => {
+								console.log(res.data)
+								if(res.data.code == 200 && res.data.data.length == 1){
+									console.log("111")
+									this.openSimple3 = true
+									return
+								}else{
+									this.$router.push({name:'agent'})
+								}
+							})
+							
+						}else{
+							this.openSimple2 = true
+							// this.$router.push({name:'app_msg'})
+						}
+					});
+				
+			},
       replace(){
         this.openSimple = true;
       },
       closeSimpleDialog () {
         this.openSimple = false;
-      },
+      },closeSimpleDialog2(){
+				this.$router.push({name:'app_msg'})
+			},closeSimpleDialog3(){
+				this.$router.push({name:'order_list'})
+			}
     }
   }
 </script>

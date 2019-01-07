@@ -1,5 +1,8 @@
 <template>
   <div class="get_agent">
+		<div class="order_title">
+			选择代理商
+		</div>
       <mu-container>
       <!-- <mu-form :model="form" class="mu-demo-form" label-position="left" label-width="100">
         <mu-form-item prop="select" label="Select">
@@ -39,9 +42,9 @@
         </div>
       </div>
     </div>
-		
-		
-  
+
+
+
 </template>
 
 <script>
@@ -85,7 +88,7 @@
             name: "agent",
           data () {
             return {
-							
+
               addressSlots: [
                 {
                   width: '100%',
@@ -144,6 +147,14 @@
 						},
           },
           created(){
+//             this.$ajax.get("/check-car/app/check/user/getUserInfo", {
+//             }).then((res)=> {
+//               if (res.data.code ==200){
+// 
+//               }else{
+//                 this.$router.push({name: 'app_msg',query:{type:1}})
+//               }
+//             });
             this.$ajax.get("/check-car/app/check/agent/all", {
             }).then((res)=> {
               if (res.data.code ==200){
@@ -153,7 +164,7 @@
           }
         }
     </script>
-    
+
     <style scoped>
     .agent_cell p{
       margin: 0;
@@ -175,5 +186,9 @@
       background-color: #00bcd4;
       color: #fafafa;
     }
-    </style>
-    
+		.order_title {
+			line-height: 60px;
+			text-align: center;
+			background-color: #dddddd;
+		}
+</style>
