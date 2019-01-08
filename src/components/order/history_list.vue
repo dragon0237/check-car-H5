@@ -13,6 +13,11 @@
 				<p><span class="lab">预约时间:</span><span>{{item.orderEntity.orderTime}}</span></p>
 			</div>
 		</div>
+		<div class="alert-demo-wrapper">
+			<mu-alert color="warning" @delete="alert1 = false" delete v-if="alert1" transition="mu-scale-transition">
+				<mu-icon left></mu-icon>没有订单啊，快去下单吧~
+			</mu-alert>
+		</div>
 		<foot-nav></foot-nav>
 	</div>
 </template>
@@ -26,6 +31,7 @@
 		},
 		data() {
 			return {
+				alert1: false,
 				isRefuse: false,
 				order_list: {}
 			}
@@ -75,6 +81,8 @@
 				} else if (state == 11) {
 					return '支付失败'
 				}
+			},toggleAlert () {
+				this.alert1 = !this.alert1;
 			}
 		}
 		
@@ -107,4 +115,29 @@
 		margin-right: 20px;
 		text-align: right;
 	}
+.alert-demo-wrapper {
+  width: 100%;
+  > .mu-alert {
+    margin-bottom: 16px;
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+  > .mu-button {
+    margin: 0 auto;
+    display: block;
+  }
+}
+
+.mu-scale-transition-enter-active,
+.mu-scale-transition-leave-active {
+  transition: transform .45s cubic-bezier(0.23, 1, 0.32, 1), opacity .45s cubic-bezier(0.23, 1, 0.32, 1);
+  backface-visibility: hidden;
+}
+
+.mu-scale-transition-enter,
+.mu-scale-transition-leave-active {
+  transform: scale(0);
+  opacity: 0;
+}
 </style>

@@ -91,6 +91,7 @@
             .then(res=>{
               console.log(res.data);
 							if(res.data.code==200){
+								// 129.204.110.142
 								this.car_out_img = 'http://129.204.110.142:8080/check-car/app/showCarPic/'+res.data.userId+'/'+this.$route.query.orderId+'/1';
 							}else if (res.data.code==500){
 								this.openSimple=true

@@ -6,8 +6,19 @@
     <div class="order_body" v-model="order_list">
       <h3>{{order_list.orderSubject}}</h3>
       <p><span class="lab">订单编号:</span><span>{{order_list.orderId}}</span></p>
-      <p><span class="lab">预约时间:</span><span>{{order_list.orderTime}}</span></p>
-      <p><span class="lab">预约地址:</span><span>{{agentAddress}}</span></p>
+			<mu-flex align-items="center">
+				<span class="lab_time">预约时间:</span>
+				<mu-date-input :disabled="isReadonly" @change="edit_ordertime" type="dateTime" v-model="order_list.orderTime" container="dialog" style="width: 180px;" actions>
+				</mu-date-input>
+				<mu-button v-if="this.order_list.orderTime" flat color="warning" @click="edit_time">修改</mu-button>
+			</mu-flex>
+      <!-- <p><span class="lab">预约时间:</span>
+				<span>{{order_list.orderTime}}</span>
+				<mu-button flat color="warning">修改</mu-button>
+			</p> --> 
+      <p><span class="lab">预约地址:</span><span>{{agentAddress}}</span>
+				<mu-button v-if="this.agentAddress" flat color="warning" @click="edit_agent">修改</mu-button>
+			</p>
       <p><span class="lab">订单价格:</span><span>￥{{order_list.orderMoney}}</span></p>
       <p><span class="lab">订单状态:</span><span>{{order_list.orderState}}</span></p>
 			<p><span class="lab" v-if="isRefuse">拒绝缘由:</span><span>{{order_list.rejectReason}}</span></p>
@@ -17,7 +28,12 @@
 			<div v-if="this.order_state == 10" class="to_wait">等待代理商确认</div>
       <div v-if="this.order_state == 3" @click="to_checkcar" class="to_check">配单成功,去检车</div>
       <div v-if="this.order_state == 4" @click="to_evaluate" class="to_check">完成检车</div>
-      <div v-if="this.order_state>0 && this.order_state < 5" @click="to_cancel" class="to_cancel">取消订单</div>
+      <div v-if="this.order_state>0 && this.order_state < 4 || this.order_state==10 " @click="to_cancel" class="to_cancel">取消订单</div>
+			<!-- <div class="button-wrapper" v-if="this.order_state>0 && this.order_state < 4">
+				<mu-button flat color="primary" class="button_font" >修改</mu-button>
+				<mu-button flat color="warning" class="button_font" @click="to_cancel">取消</mu-button>
+			</div>
+			 -->
     </div>
 		<mu-dialog title="提示信息" width="360" :open.sync="openSimple">
 			检车是否已完成？
@@ -60,8 +76,10 @@
 				openSimple: false,
 				openSimple2: false,
 				openSimple3: false,
+				isReadonly: true,
 				msg: '',
         order_list: {},
+				old_time: undefined,
         agentAddress: "",
         order_state: 0
       }
@@ -74,6 +92,7 @@
         else if (res.data.code == 200) {
 					console.log(res.data)
             this.order_list = res.data.data[0].orderEntity;
+						this.old_time = this.order_list.orderTime
             let alipayNotifyEntity = res.data.data[0].alipayNotifyEntity;
             this.agentAddress = res.data.data[0].agentEntity.agentAddress;
             this.order_state = res.data.data[0].orderEntity.orderState;
@@ -103,6 +122,7 @@
 							case 10:
 								this.order_list.orderState = "订单修改，等待代理商确认";
 								break;
+							
 							default :
 								this.order_list.orderState = '未知'
 						}
@@ -115,7 +135,15 @@
       },
       to_checkcar(){
         this.$router.push({name:'check_car',query:{orderId: this.order_list.orderId}})
-      },to_evaluate(){
+      },edit_agent(){
+				if(this.order_list.orderState == '已开始检车'){
+					this.openSimple3=true
+					this.msg="已开始检车，不可修改"
+				}else{
+					this.$router.push({name:'agent',query:{orderId: this.order_list.orderId}})
+				}
+				
+			},to_evaluate(){
 				this.openSimple=true
 				this.msg= '检车是否已完成？'
 			},closeSimpleDialog(){
@@ -132,7 +160,9 @@
 				this.openSimple2=false
 				this.$ajax.get("/check-car/app/check/cancelOrder?orderId="+this.order_list.orderId, {
 				}).then((res) => {
-					if(res.data.code == 200 || res.data.code == 500){
+					if(res.data.code == 200){
+						this.msg= res.data.msg
+					}else if(res.data.code == 500){
 						this.msg= res.data.msg
 					}else{
 						this.msg= '未知异常!'
@@ -140,6 +170,39 @@
 					this.openSimple3=true
 				})
 				
+			},edit_time(){
+				
+				if(this.order_list.orderState == '已开始检车'){
+					this.openSimple3=true
+					this.msg="已开始检车，不可修改"
+				}else{
+					this.isReadonly=false
+				}
+			},edit_ordertime(value){
+				let date = JSON.stringify(this.order_list.orderTime);
+				date = date.replace("T"," ");
+				date = date.slice(1,20);
+				console.log(value)
+				console.log(this.order_list.orderTime)
+				console.log(date)
+				this.$ajax.post("/check-car/app/check/updateOrder", {
+					"orderId": this.order_list.orderId,
+					"orderTime": date
+				}).then((res)=> {
+					this.isReadonly=true
+						if (res.data.code ==200){
+							this.openSimple3=true
+							this.msg=res.data.msg
+						} else if(res.data.code ==500){
+								this.openSimple3=true
+								this.msg=res.data.msg
+								this.order_list.orderTime = this.old_time
+						}else{
+							this.order_list.orderTime = this.old_time
+							this.openSimple3=true
+							this.msg='未知异常'
+						}
+				});
 			},toggleAlert () {
 				this.alert1 = !this.alert1;
 			}
@@ -167,6 +230,13 @@
     margin-right: 20px;
     text-align: right;
   }
+	.lab_time {
+		display: inline-block;
+		width: 80px;
+		margin-left: 18px;
+		margin-right: 20px;
+		text-align: right;
+	}
 
   .to_check {
     margin: 20px auto 0;
@@ -201,6 +271,22 @@
     color: #666;
     font-size: 16px;
   }
+	.button-wrapper {
+		width: 90%;
+		margin: 20px auto 0;
+		line-height: 60px;
+		border: 1px solid #666;
+		margin-top: 10px;
+		text-align: center;
+		.mu-button{
+			margin: 15px;
+			margin-left: 10px;
+			
+		}
+	}
+	.button_font{
+		font-size: 20px;
+	}
 	
 .alert-demo-wrapper {
   width: 100%;
