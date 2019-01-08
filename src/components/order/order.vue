@@ -49,7 +49,7 @@
         }
       },
       created(){
-        this.$ajax.get("/check-car/app/check/userOrders", {
+        this.$ajax.get("/check-car/app/check/userOrders?type=0", {
         }).then((res)=> {
           if (res.data.code == 200) {
 

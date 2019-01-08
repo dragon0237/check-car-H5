@@ -8,7 +8,8 @@
 				<h3>{{item.orderEntity.orderSubject}}</h3>
 				<p><span class="lab">订单编号:</span><span>{{item.orderEntity.orderId}}</span></p>
 				<p><span class="lab">订单状态:</span><span>{{item.orderEntity.orderState}}</span></p>
-				<p><span class="lab" v-if=" '订单拒绝'==item.orderEntity.orderState ">拒绝缘由:</span><span>{{order_list.rejectReason}}</span></p>
+				<p><span class="lab" v-if=" '订单拒绝'==item.orderEntity.orderState ">拒绝缘由:</span>
+				<span>{{item.orderEntity.rejectReason}}</span></p>
 				<p><span class="lab">预约时间:</span><span>{{item.orderEntity.orderTime}}</span></p>
 			</div>
 		</div>
@@ -66,7 +67,7 @@
 				} else if (state == 7) {
 					return '订单拒绝'
 				} else if (state == 8) {
-					return '取消订单'
+					return '订单已取消'
 				} else if (state == 9) {
 					return '订单处理失败'
 				} else if (state == 10) {

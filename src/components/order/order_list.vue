@@ -17,13 +17,30 @@
 			<div v-if="this.order_state == 10" class="to_wait">等待代理商确认</div>
       <div v-if="this.order_state == 3" @click="to_checkcar" class="to_check">配单成功,去检车</div>
       <div v-if="this.order_state == 4" @click="to_evaluate" class="to_check">完成检车</div>
-      <div v-if="this.order_state < 5" class="to_cancel">取消订单</div>
+      <div v-if="this.order_state>0 && this.order_state < 5" @click="to_cancel" class="to_cancel">取消订单</div>
     </div>
 		<mu-dialog title="提示信息" width="360" :open.sync="openSimple">
-			{{msg}}
-			<mu-button slot="actions" flat color="primary" @click="closeSimpleDialog">取消</mu-button>
+			检车是否已完成？
+			<mu-button slot="actions" flat @click="closeSimpleDialog">取消</mu-button>
 			<mu-button slot="actions" flat color="primary" @click="goSuccess">确定</mu-button>
 		</mu-dialog>
+		
+		<mu-dialog title="提示信息" width="360" :open.sync="openSimple3">
+			{{msg}}
+			<mu-button slot="actions" flat color="primary" @click="closeSimpleDialog">关闭</mu-button>
+		</mu-dialog>
+		
+		<mu-dialog title="提示信息" width="360" :open.sync="openSimple2">
+			确定取消订单吗?
+			<mu-button slot="actions" flat @click="closeSimpleDialog2">取消</mu-button>
+			<mu-button slot="actions" flat color="primary" @click="goSuccess2">确定</mu-button>
+		</mu-dialog>
+		
+		<div class="alert-demo-wrapper">
+			<mu-alert color="warning" @delete="alert1 = false" delete v-if="alert1" transition="mu-scale-transition">
+				<mu-icon left></mu-icon>没有订单啊，快去下单吧~
+			</mu-alert>
+		</div>
     <foot-nav></foot-nav>
   </div>
 </template>
@@ -38,8 +55,11 @@
     },
     data() {
       return {
+				alert1: false,
 				isRefuse: false,
 				openSimple: false,
+				openSimple2: false,
+				openSimple3: false,
 				msg: '',
         order_list: {},
         agentAddress: "",
@@ -48,7 +68,11 @@
     },
     created() {
       this.$ajax.get("/check-car/app/check/userOrders?type=0", {}).then((res) => {
-        if (res.data.code == 200) {
+				if(res.data.code == 500){
+					this.alert1=true
+				}
+        else if (res.data.code == 200) {
+					console.log(res.data)
             this.order_list = res.data.data[0].orderEntity;
             let alipayNotifyEntity = res.data.data[0].alipayNotifyEntity;
             this.agentAddress = res.data.data[0].agentEntity.agentAddress;
@@ -87,7 +111,7 @@
     },
     methods:{
       to_payfor(){
-        this.$router.push({name:'order'})
+        this.$router.push({name:'order',query:{orderId: this.order_list.orderId}})
       },
       to_checkcar(){
         this.$router.push({name:'check_car',query:{orderId: this.order_list.orderId}})
@@ -96,9 +120,28 @@
 				this.msg= '检车是否已完成？'
 			},closeSimpleDialog(){
 				this.openSimple=false
+				this.openSimple3=false
 			},goSuccess(){
 				this.openSimple=false
 				this.$router.push({name:'evaluate',query:{orderId: this.order_list.orderId}})
+			},to_cancel(){
+				this.openSimple2=true
+			},closeSimpleDialog2(){
+				this.openSimple2=false
+			},goSuccess2(){
+				this.openSimple2=false
+				this.$ajax.get("/check-car/app/check/cancelOrder?orderId="+this.order_list.orderId, {
+				}).then((res) => {
+					if(res.data.code == 200 || res.data.code == 500){
+						this.msg= res.data.msg
+					}else{
+						this.msg= '未知异常!'
+					}
+					this.openSimple3=true
+				})
+				
+			},toggleAlert () {
+				this.alert1 = !this.alert1;
 			}
     }
   }
@@ -158,4 +201,30 @@
     color: #666;
     font-size: 16px;
   }
+	
+.alert-demo-wrapper {
+  width: 100%;
+  > .mu-alert {
+    margin-bottom: 16px;
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+  > .mu-button {
+    margin: 0 auto;
+    display: block;
+  }
+}
+
+.mu-scale-transition-enter-active,
+.mu-scale-transition-leave-active {
+  transition: transform .45s cubic-bezier(0.23, 1, 0.32, 1), opacity .45s cubic-bezier(0.23, 1, 0.32, 1);
+  backface-visibility: hidden;
+}
+
+.mu-scale-transition-enter,
+.mu-scale-transition-leave-active {
+  transform: scale(0);
+  opacity: 0;
+}
 </style>

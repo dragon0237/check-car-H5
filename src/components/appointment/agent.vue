@@ -1,8 +1,10 @@
 <template>
   <div class="get_agent">
-		<div class="order_title">
+		<!-- <div class="order_title">
 			选择代理商
-		</div>
+		</div> -->
+		
+		<steper></steper>
     <mu-container>
 			<mu-dialog title="提示信息" width="360" :open.sync="openSimple">
 				{{msg}}
@@ -72,8 +74,12 @@
     '澳门': ['澳门'],
     '台湾': ['台北市', '高雄市', '台北县', '桃园县', '新竹县', '苗栗县', '台中县', '彰化县', '南投县', '云林县', '嘉义县', '台南县', '高雄县', '屏东县', '宜兰县', '花莲县', '台东县', '澎湖县', '基隆市', '新竹市', '台中市', '嘉义市', '台南市']
   }
+	import steper from '../common/steper'
     export default {
             name: "agent",
+						components:{
+							steper
+						},
           data () {
             return {
 
@@ -120,6 +126,9 @@
                 if (res.data.code ==200){
                   this.data = res.data.data;
 									if(res.data.data.length == 0){
+										
+										// Toast.info('该区域暂无代理商');
+										
 										this.msg='该区域暂无代理商'
 										this.openSimple = true
 									}

@@ -181,8 +181,10 @@
       closeSimpleDialog () {
         this.openSimple = false;
       },closeSimpleDialog2(){
+				this.openSimple2=false
 				this.$router.push({name:'app_msg'})
 			},closeSimpleDialog3(){
+				this.openSimple3=false
 				this.$router.push({name:'order_list'})
 			}
     }
